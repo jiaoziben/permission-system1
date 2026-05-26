@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>简易仓库管理演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f2f5;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 24px 20px;
+            color: #1e293b;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        .sub {
+            color: #475569;
+            margin-bottom: 28px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            font-size: 0.9rem;
+        }
+        /* 卡片通用样式 */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            transition: 0.2s;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #eef2ff;
+            padding-bottom: 12px;
+        }
+        .badge {
+            background: #eef2ff;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        /* 表单行 */
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 18px;
+        }
+        .field {
+            flex: 1;
+            min-width: 140px;
+        }
+        .field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        button {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .btn-outline {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+        .btn-outline:hover {
+            background: #f8fafc;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.75rem;
+        }
+        /* 表格 */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #eef2ff;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .stock-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+        .action-icons {
+            display: flex;
+            gap: 10px;
+        }
+        .action-icons span {
+            cursor: pointer;
+            color: #64748b;
+            font-size: 1.1rem;
+            transition: 0.1s;
+        }
+        .action-icons span:hover {
+            color: #ef4444;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .total-stats {
+            background: #f1f5f9;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        hr {
+            margin: 16px 0;
+            border-color: #eef2ff;
+        }
+        @media (max-width: 700px) {
+            body { padding: 16px; }
+            .card { padding: 16px; }
+            .form-row { flex-direction: column; align-items: stretch; }
+            .field { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📦 智能仓库管理演示</h1>
+    <div class="sub">产品原型 · 支持仓库/商品管理、入库出库、实时库存</div>
+
+    <!-- 1. 添加仓库 + 商品 -->
+    <div class="card">
+        <div class="card-title">🏢 基础数据维护</div>
+        <div class="form-row">
+            <div class="field">
+                <label>仓库名称</label>
+                <input type="text" id="warehouseName" placeholder="例如：华东中心仓" value="华东中心仓">
+            </div>
+            <div class="field">
+                <label>仓库地址 (选填)</label>
+                <input type="text" id="warehouseAddr" placeholder="上海市普陀区">
+            </div>
+            <button id="addWarehouseBtn">➕ 添加仓库</button>
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label>商品名称</label>
+                <input type="text" id="productName" placeholder="例如：无线鼠标" value="无线鼠标">
+            </div>
+            <div class="field">
+                <label>SKU/编码</label>
+                <input type="text" id="productSku" placeholder="SKU-001" value="MOUSE-01">
+            </div>
+            <div class="field">
+                <label>初始库存</label>
+                <input type="number" id="initStock" value="50" min="0">
+            </div>
+            <button id="addProductBtn">📦 添加商品</button>
+        </div>
+    </div>
+
+    <!-- 2. 库存操作：入库 / 出库 -->
+    <div class="card">
+        <div class="card-title">📊 库存变动 <span class="badge">入库 / 出库 / 调拨演示</span></div>
+        <div class="form-row">
+            <div class="field">
+                <label>选择仓库</label>
+                <select id="opWarehouse"></select>
+            </div>
+            <div class="field">
+                <label>选择商品</label>
+                <select id="opProduct"></select>
+            </div>
+            <div class="field">
+                <label>操作类型</label>
+                <select id="opType">
+                    <option value="in">📥 入库</option>
+                    <option value="out">📤 出库</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>数量</label>
+                <input type="number" id="opQty" value="5" min="1">
+            </div>
+            <button id="executeOpBtn">✅ 执行变动</button>
+        </div>
+    </div>
+
+    <!-- 3. 仓库列表 + 库存明细表 -->
+    <div class="card">
+        <div class="flex-between">
+            <div class="card-title" style="border-bottom: none; padding-bottom:0;">🗂️ 仓库列表</div>
+            <div class="total-stats" id="totalStatDisplay">总库存商品数: --</div>
+        </div>
+        <div id="warehouseListContainer"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📋 所有库存明细 (按仓库+商品)</div>
+        <div class="table-wrapper" id="inventoryTableWrapper">
+            <table id="inventoryTable">
+                <thead>
+                    <tr><th>仓库</th><th>商品名称</th><th>SKU</th><th>当前库存</th><th>操作</th></tr>
+                </thead>
+                <tbody id="inventoryTbody">
+                    <tr><td colspan="5" style="text-align:center;">暂无数据，请添加仓库和商品</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 数据模型 ----------
+    let warehouses = [
+        { id: "wh1", name: "华东中心仓", address: "上海市普陀区" },
+        { id: "wh2", name: "华南分拨仓", address: "广州市黄埔区" }
+    ];
+    let products = [
+        { id: "p1", name: "无线鼠标", sku: "MOUSE-01" },
+        { id: "p2", name: "机械键盘", sku: "KB-202" }
+    ];
+    // 库存: key = warehouseId + "_" + productId, value: 数量
+    let inventories = {
+        "wh1_p1": 120,
+        "wh1_p2": 45,
+        "wh2_p1": 80,
+        "wh2_p2": 22
+    };
+
+    // 辅助函数生成id
+    function genId(prefix) {
+        return prefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    }
+
+    // 渲染仓库列表和下拉框
+    function renderWarehouses() {
+        const container = document.getElementById('warehouseListContainer');
+        if(!container) return;
+        if(warehouses.length === 0) {
+            container.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b;">暂无仓库，请添加上方表单</div>';
+        } else {
+            let html = '<div style="display:flex; flex-wrap:wrap; gap:12px;">';
+            warehouses.forEach(wh => {
+                html += `
+                    <div style="background:#f9fafb; border-radius:18px; padding:12px 18px; flex:1; min-width:180px; border:1px solid #eef2ff;">
+                        <div style="font-weight:700;">🏭 ${escapeHtml(wh.name)}</div>
+                        <div style="font-size:12px; color:#475569;">${escapeHtml(wh.address || '无地址')}</div>
+                        <div style="margin-top:8px;"><button class="btn-outline btn-sm" data-whid="${wh.id}" onclick="removeWarehouse('${wh.id}')">删除仓库</button></div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // 刷新操作下拉框
+        const opWareSel = document.getElementById('opWarehouse');
+        if(opWareSel) {
+            opWareSel.innerHTML = warehouses.map(wh => `<option value="${wh.id}">${escapeHtml(wh.name)}</option>`).join('');
+            if(warehouses.length === 0) opWareSel.innerHTML = '<option disabled>请先添加仓库</option>';
+        }
+    }
+
+    // 渲染商品下拉
+    function renderProductSelects() {
+        const opProdSel = document.getElementById('opProduct');
+        if(opProdSel) {
+            opProdSel.innerHTML = products.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.sku)})</option>`).join('');
+            if(products.length === 0) opProdSel.innerHTML = '<option disabled>请先添加商品</option>';
+        }
+    }
+
+    // 渲染库存表格
+    function renderInventory() {
+        const tbody = document.getElementById('inventoryTbody');
+        if(!tbody) return;
+        let rows = '';
+        for(let [key, stock] of Object.entries(inventories)) {
+            const [whId, prodId] = key.split('_');
+            const warehouse = warehouses.find(w => w.id === whId);
+            const product = products.find(p => p.id === prodId);
+            if(!warehouse || !product) continue; // 数据不完整跳过
+            rows += `
+                <tr>
+                    <td>${escapeHtml(warehouse.name)}</td>
+                    <td>${escapeHtml(product.name)}</td>
+                    <td>${escapeHtml(product.sku)}</td>
+                    <td><span class="stock-badge">${stock}</span></td>
+                    <td class="action-icons">
+                        <span title="入库 +1" onclick="quickAdjust('${whId}','${prodId}',1)">📥</span>
+                        <span title="出库 -1" onclick="quickAdjust('${whId}','${prodId}',-1)">📤</span>
+                    </td>
+                </tr>
+            `;
+        }
+        if(rows === '') {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">暂无库存记录，请添加仓库和商品，然后执行入库操作</td></tr>';
+        } else {
+            tbody.innerHTML = rows;
+        }
+        // 更新总库存统计
+        let totalQty = 0;
+        for(let v of Object.values(inventories)) totalQty += v;
+        const statSpan = document.getElementById('totalStatDisplay');
+        if(statSpan) statSpan.innerText = `📊 总库存量: ${totalQty} 件`;
+    }
+
+    // 快速调整 +delta
+    window.quickAdjust = function(whId, prodId, delta) {
+        const key = `${whId}_${prodId}`;
+        const old = inventories[key] || 0;
+        let newVal = old + delta;
+        if(newVal < 0) {
+            alert("出库失败：库存不足");
+            return;
+        }
+        inventories[key] = newVal;
+        if(newVal === 0 && delta < 0) {
+            // 如果变成0且是出库，可选保留记录
+        }
+        renderInventory();
+    };
+
+    // 添加仓库
+    document.getElementById('addWarehouseBtn')?.addEventListener('click', () => {
+        const nameInput = document.getElementById('warehouseName');
+        const addrInput = document.getElementById('warehouseAddr');
+        let name = nameInput.value.trim();
+        if(!name) { alert("请填写仓库名称"); return; }
+        const newId = genId("wh");
+        warehouses.push({ id: newId, name: name, address: addrInput.value.trim() });
+        nameInput.value = '';
+        addrInput.value = '';
+        renderWarehouses();
+        renderInventory(); // 表格需要刷新联动
+    });
+
+    // 删除仓库
+    window.removeWarehouse = function(whId) {
+        if(confirm("确定删除该仓库吗？其库存记录也会被清除")) {
+            warehouses = warehouses.filter(w => w.id !== whId);
+            // 删除相关库存
+            const keysToDelete = Object.keys(inventories).filter(k => k.startsWith(whId+"_"));
+            keysToDelete.forEach(k => delete inventories[k]);
+            renderWarehouses();
+            renderInventory();
+        }
+    };
+
+    // 添加商品
+    document.getElementById('addProductBtn')?.addEventListener('click', () => {
+        const pName = document.getElementById('productName').value.trim();
+        const pSku = document.getElementById('productSku').value.trim();
+        const initStockVal = parseInt(document.getElementById('initStock').value, 10);
+        if(!pName) { alert("商品名称不能为空"); return; }
+        if(!pSku) { alert("SKU不能为空"); return; }
+        const newProdId = genId("p");
+        const newProduct = { id: newProdId, name: pName, sku: pSku };
+        products.push(newProduct);
+        // 可选：为每个已有仓库初始库存
+        const initQty = isNaN(initStockVal) ? 0 : initStockVal;
+        if(initQty > 0) {
+            for(let wh of warehouses) {
+                const key = `${wh.id}_${newProdId}`;
+                if(inventories[key] === undefined) inventories[key] = initQty;
+                else inventories[key] += initQty;
+            }
+        } else {
+            for(let wh of warehouses) {
+                const key = `${wh.id}_${newProdId}`;
+                if(!inventories[key]) inventories[key] = 0;
+            }
+        }
+        // 清空部分表单
+        document.getElementById('productName').value = '';
+        document.getElementById('productSku').value = '';
+        document.getElementById('initStock').value = '0';
+        renderProductSelects();
+        renderInventory();
+    });
+
+    // 执行入库/出库
+    document.getElementById('executeOpBtn')?.addEventListener('click', () => {
+        const whId = document.getElementById('opWarehouse').value;
+        const prodId = document.getElementById('opProduct').value;
+        const opType = document.getElementById('opType').value;
+        let qty = parseInt(document.getElementById('opQty').value, 10);
+        if(!whId || !prodId) { alert("请完整选择仓库和商品"); return; }
+        if(isNaN(qty) || qty <= 0) { alert("数量必须大于0"); return; }
+        const key = `${whId}_${prodId}`;
+        let current = inventories[key] || 0;
+        if(opType === 'out') {
+            if(current < qty) { alert(`出库失败，库存不足 (当前库存 ${current})`); return; }
+            inventories[key] = current - qty;
+        } else {
+            inventories[key] = current + qty;
+        }
+        renderInventory();
+        document.getElementById('opQty').value = '5';
+    });
+
+    // 删除商品（额外功能，不绑定在UI上，但提供快捷，可以作为菜单；为了体验，加一个隐藏能力可选，不用太复杂）
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+
+    // 初始化渲染
+    function init() {
+        renderWarehouses();
+        renderProductSelects();
+        renderInventory();
+    }
+    init();
+</script>
+</body>
+</html>

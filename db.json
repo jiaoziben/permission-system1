@@ -1,0 +1,49 @@
+{
+  "permissions": [
+    {
+      "id": "1",
+      "code": "user:view",
+      "name": "查看用户",
+      "type": "按钮",
+      "parentCode": "0",
+      "path": "",
+      "icon": "",
+      "sort": 0,
+      "status": "启用"
+    },
+    {
+      "id": "2",
+      "code": "user:create",
+      "name": "创建用户",
+      "type": "按钮",
+      "parentCode": "0",
+      "path": "",
+      "icon": "",
+      "sort": 1,
+      "status": "启用"
+    },
+    {
+      "code": "cesiliuc111",
+      "name": "1111",
+      "type": "按钮",
+      "parentCode": "0",
+      "path": "",
+      "icon": "",
+      "sort": 0,
+      "status": "启用",
+      "id": "xTwK5bnwQms"
+    },
+    {
+      "code": "红红火火恍恍惚惚哈哈哈哈哈哈哈哈",
+      "name": "111",
+      "type": "按钮",
+      "parentCode": "0",
+      "path": "",
+      "icon": "",
+      "sort": 0,
+      "status": "启用",
+      "id": "RPVSmnA6mZA"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
